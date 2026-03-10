@@ -2,6 +2,8 @@ name: Build Electrolyzer Data Records APK
 
 on:
   push:
+    branches:
+      - main
     tags:
       - 'v*'
 
@@ -15,13 +17,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '22.x' # Force the latest 22.x LTS version
-          cache: 'npm'
-
-      - name: Verify Environment
-        run: |
-          node -v
-          npm -v
+          node-version: '22'
 
       - name: Install Dependencies
         run: npm install
@@ -45,5 +41,5 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: Electrolyzer-Records-v1.0.8
+          name: Electrolyzer-Records-APK
           path: android/app/build/outputs/apk/debug/app-debug.apk
