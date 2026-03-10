@@ -15,7 +15,11 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: '22.x' # Added .x to ensure latest 22 release
+          cache: 'npm'
+
+      - name: Verify Node Version
+        run: node -v
 
       - name: Install Dependencies
         run: npm install
@@ -39,5 +43,5 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: Electrolyzer-Records-v1.0.6
+          name: Electrolyzer-Records-v1.0.8
           path: android/app/build/outputs/apk/debug/app-debug.apk
