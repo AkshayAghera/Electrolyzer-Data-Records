@@ -17,7 +17,13 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: '22.13.0' # Specific LTS version
+          cache: 'npm'
+
+      - name: Force Node Path
+        run: |
+          echo "NODE_VERSION=$(node -v)"
+          echo "PATH=$(npm config get prefix)/bin:$PATH" >> $GITHUB_ENV
 
       - name: Install Dependencies
         run: npm install
