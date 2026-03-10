@@ -15,11 +15,13 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '22.x' # Added .x to ensure latest 22 release
+          node-version: '22.x' # Force the latest 22.x LTS version
           cache: 'npm'
 
-      - name: Verify Node Version
-        run: node -v
+      - name: Verify Environment
+        run: |
+          node -v
+          npm -v
 
       - name: Install Dependencies
         run: npm install
