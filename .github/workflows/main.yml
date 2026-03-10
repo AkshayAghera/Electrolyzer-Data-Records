@@ -15,23 +15,13 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18'
+          node-version: '22'
 
       - name: Install Dependencies
         run: npm install
 
       - name: Build Web Project
-        run: |
-          # If you use a build command like 'npm run build', keep it here. 
-          # If you are using plain HTML/JS, we ensure the folder exists.
-          mkdir -p www
-          cp index.html www/ 2>/dev/null || echo "Using existing build"
-
-      - name: Install Capacitor Android
-        run: npm install @capacitor/android
-
-      - name: Sync Capacitor
-        run: npx cap sync android
+        run: npm run build
 
       - name: Setup Java
         uses: actions/setup-java@v3
@@ -39,14 +29,15 @@ jobs:
           distribution: 'zulu'
           java-version: '17'
 
-      - name: Build Android APK
+      - name: Sync and Build Android
         run: |
+          npx cap sync android
           cd android
           chmod +x gradlew
           ./gradlew assembleDebug
 
-      - name: Upload APK Artifact
+      - name: Upload APK
         uses: actions/upload-artifact@v3
         with:
-          name: Electrolyzer-Records-v1.0.1
+          name: Electrolyzer-Records-v1.0.5
           path: android/app/build/outputs/apk/debug/app-debug.apk
