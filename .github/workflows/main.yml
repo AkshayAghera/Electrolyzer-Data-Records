@@ -1,3 +1,4 @@
+# Build Trigger Version: 1.1.1
 name: Build Electrolyzer Data Records APK
 
 on:
@@ -17,7 +18,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '22.13.0' # Specific LTS version
+          node-version: '22.13.0'
           cache: 'npm'
 
       - name: Force Node Path
