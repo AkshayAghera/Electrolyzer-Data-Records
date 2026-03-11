@@ -1,10 +1,10 @@
-# Build Trigger Version: 1.1.5-Final
+# BUILD_ID: 2026-03-11-FINAL-FORCE
 name: Build Electrolyzer Data Records APK
 
 on:
   push:
     branches: [ main ]
-    tags: [ 'v*' ]
+  workflow_dispatch: # This allows you to start the build manually
 
 jobs:
   build:
@@ -17,7 +17,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
-          cache: 'npm'
 
       - name: Install Dependencies
         run: npm install
@@ -28,11 +27,13 @@ jobs:
           distribution: 'zulu'
           java-version: '17'
 
-      - name: Force Android Build
+      - name: Build Web Assets
+        run: npm run build
+
+      - name: FORCE_ANDROID_BUILD
         run: |
-          # We bypass 'npx' and use 'node' directly to run the CLI
+          # Use the absolute path to the Node 22 engine
           node node_modules/@capacitor/cli/bin/capacitor sync android
-          
           cd android
           chmod +x gradlew
           ./gradlew assembleDebug
