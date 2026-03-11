@@ -1,4 +1,4 @@
-# BUILD_ID: 2026-03-11-JAVA21-FIX
+# BUILD_ID: 2026-03-11-REAL-LOGO-READY
 name: Build Electrolyzer Data Records APK
 
 on:
@@ -25,23 +25,17 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: 'zulu'
-          java-version: '21' # Fixed: Updated from 17 to 21
+          java-version: '21'
 
       - name: Build Web Assets
         run: npm run build
 
-      - name: Force Android Build
+      - name: Final Android Build
         run: |
-          # 1. Create a placeholder logo if plant_logo is missing to prevent crash
-          mkdir -p android/app/src/main/res/drawable
-          if [ ! -f android/app/src/main/res/drawable/plant_logo.png ]; then
-            cp android/app/src/main/res/drawable-v24/ic_launcher_foreground.xml android/app/src/main/res/drawable/plant_logo.xml || echo "No icon found"
-          fi
-
-          # 2. Run Sync
+          # 1. Run Sync (This links your web code to the Android project)
           node node_modules/@capacitor/cli/bin/capacitor sync android
           
-          # 3. Build APK
+          # 2. Build the actual APK
           cd android
           chmod +x gradlew
           ./gradlew assembleDebug
@@ -49,5 +43,5 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: Electrolyzer-Records-v1.1.7
+          name: Electrolyzer-Records-v1.1.9
           path: android/app/build/outputs/apk/debug/app-debug.apk
