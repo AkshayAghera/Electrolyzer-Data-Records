@@ -1,12 +1,10 @@
-# Build Trigger Version: 1.1.4
+# Build Trigger Version: 1.1.5-Final
 name: Build Electrolyzer Data Records APK
 
 on:
   push:
-    branches:
-      - main
-    tags:
-      - 'v*'
+    branches: [ main ]
+    tags: [ 'v*' ]
 
 jobs:
   build:
@@ -15,17 +13,14 @@ jobs:
       - name: Checkout Source
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Setup Node.js 22
         uses: actions/setup-node@v4
         with:
-          node-version: '22.13.0'
+          node-version: '22'
           cache: 'npm'
 
       - name: Install Dependencies
         run: npm install
-
-      - name: Build Web Project
-        run: npm run build
 
       - name: Setup Java
         uses: actions/setup-java@v4
@@ -33,15 +28,11 @@ jobs:
           distribution: 'zulu'
           java-version: '17'
 
-      - name: Force Sync and Build
+      - name: Force Android Build
         run: |
-          # 1. Confirm we are on Node 22
-          node -v
+          # We bypass 'npx' and use 'node' directly to run the CLI
+          node node_modules/@capacitor/cli/bin/capacitor sync android
           
-          # 2. Use the LOCAL capacitor binary (bypass global npx)
-          ./node_modules/.bin/cap sync android
-          
-          # 3. Build the APK
           cd android
           chmod +x gradlew
           ./gradlew assembleDebug
