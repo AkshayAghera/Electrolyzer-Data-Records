@@ -1,4 +1,4 @@
-# Build Trigger Version: 1.1.1
+# Build Trigger Version: 1.1.2
 name: Build Electrolyzer Data Records APK
 
 on:
@@ -18,13 +18,9 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '22.13.0'
+          node-version: '22'
+          check-latest: true # Forces GitHub to fetch the actual latest 22
           cache: 'npm'
-
-      - name: Force Node Path
-        run: |
-          echo "NODE_VERSION=$(node -v)"
-          echo "PATH=$(npm config get prefix)/bin:$PATH" >> $GITHUB_ENV
 
       - name: Install Dependencies
         run: npm install
@@ -40,7 +36,9 @@ jobs:
 
       - name: Sync and Build Android
         run: |
-          npx cap sync android
+          # Use the local node version explicitly
+          node -v
+          ./node_modules/.bin/cap sync android
           cd android
           chmod +x gradlew
           ./gradlew assembleDebug
