@@ -1,6 +1,6 @@
 {
   "appId": "com.electrolyzer.records",
-  "appName": "Electrolyzer Data Records",
+  "appName": "Electrolyzer Data",
   "webDir": "www",
   "plugins": {
     "SplashScreen": {
