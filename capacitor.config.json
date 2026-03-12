@@ -1,18 +1,17 @@
 {
-  "appId": "com.akshayaghera.massbalance",
-  "appName": "Mass Balance CSP",
-  "webDir": "dist",
+  "appId": "com.electrolyzer.records",
+  "appName": "Electrolyzer Data Records",
+  "webDir": "www",
   "plugins": {
     "SplashScreen": {
       "launchShowDuration": 3000,
       "launchAutoHide": true,
-      "backgroundColor": "#ffffff",
-      "androidScaleType": "CENTER_CROP",
-      "showSpinner": true,
+      "androidSplashResourceName": "plant_logo",
+      "androidScaleType": "fitCenter",
+      "showSpinner": false,
       "splashFullScreen": true,
       "splashImmersive": true,
-      "layoutName": "launch_screen",
-      "useDialog": false
+      "useDialog": true 
     }
   }
 }
