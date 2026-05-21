@@ -119,7 +119,20 @@ th { background: #eef3f8; font-weight: 600; }
     color: var(--blue-main);
   }
 }
-.chart-board { display: none; min-height: 400px; }
+
+/* FIX 1: Remove min-height, use fixed height instead */
+.chart-board {
+  display: none;
+  /* NO min-height here — that was causing the slow grow */
+}
+
+/* FIX 2: Fixed height wrapper so Chart.js knows exact space */
+.chart-container {
+  position: relative;
+  width: 100%;
+  height: 280px;        /* fixed — no growing */
+}
+
 .engineer-panel { display: none; background: #f0f4f8; }
 </style>
 </head>
@@ -190,7 +203,10 @@ th { background: #eef3f8; font-weight: 600; }
 <div class="chart-board left-indicator" id="trendCard">
   <div class="board-title">Trend Analysis</div>
   <div id="trendContext" style="font-size:12px; color:#6b7a90; margin-bottom:12px;"></div>
-  <canvas id="trendChart"></canvas>
+  <!-- FIX: Wrap canvas in a fixed-height container -->
+  <div class="chart-container">
+    <canvas id="trendChart"></canvas>
+  </div>
 </div>
 
 <script>
@@ -208,28 +224,21 @@ function hideStatus() {
   document.getElementById("statusMsg").style.display = "none";
 }
 
-// Fetch with XMLHttpRequest — works in Android WebView APK without CORS issues
 function fetchData() {
   showStatus("Loading data from server...", false);
-  
   const xhr = new XMLHttpRequest();
   xhr.open("GET", API_URL, true);
   xhr.timeout = 30000;
-  
   xhr.onreadystatechange = function() {
     if (xhr.readyState !== 4) return;
-    
     if (xhr.status === 200) {
       try {
         let parsed = JSON.parse(xhr.responseText);
-        // Handle both {data:[...]} and plain [...] responses
         allData = Array.isArray(parsed) ? parsed : (parsed.data || []);
-        
         if (!allData.length) {
           showStatus("No data found in sheet. Please run the Python sync script.", true);
           return;
         }
-        
         hideStatus();
         const el = document.getElementById("electrolyser");
         el.innerHTML = "<option>Select</option>";
@@ -243,13 +252,10 @@ function fetchData() {
       showStatus("Server error: HTTP " + xhr.status + ". Check your deployment URL.", true);
     }
   };
-  
   xhr.ontimeout = function() {
     showStatus("Request timed out. Check internet connection.", true);
   };
-  
   xhr.onerror = function() {
-    // Fallback: try fetch API if XHR fails
     fetch(API_URL, { redirect: "follow" })
       .then(function(r) { return r.json(); })
       .then(function(parsed) {
@@ -269,7 +275,6 @@ function fetchData() {
         showStatus("Connection failed. Check internet and try again. (" + err.message + ")", true);
       });
   };
-  
   xhr.send();
 }
 
@@ -308,10 +313,18 @@ function generateTrend() {
   const idx      = elecData.findIndex(r => r.Month === selMonth);
   if (idx === -1) { alert("Please select a Month first."); return; }
   const trendData = elecData.slice(Math.max(0, idx - 11), idx + 1);
-  document.getElementById("trendCard").style.display = "block";
+
+  const trendCard = document.getElementById("trendCard");
+  trendCard.style.display = "block";
   document.getElementById("trendContext").textContent =
-    "Trend for " + elec + ": " + param + " (Last 12 months)";
-  if (chart) chart.destroy();
+    "Trend for Electrolyser " + elec + ": " + param + " (Last 12 months)";
+
+  // FIX: Always destroy old chart before creating new one
+  if (chart) {
+    chart.destroy();
+    chart = null;
+  }
+
   const ctx = document.getElementById("trendChart").getContext("2d");
   chart = new Chart(ctx, {
     type: "line",
@@ -323,14 +336,35 @@ function generateTrend() {
         borderColor: "#0066cc",
         backgroundColor: "rgba(0,102,204,0.1)",
         fill: true,
-        tension: 0.3
+        tension: 0.3,
+        pointRadius: 4,
+        pointHoverRadius: 6
       }]
     },
-    options: { responsive: true, maintainAspectRatio: false }
+    options: {
+      responsive: true,
+      // FIX: Keep maintainAspectRatio TRUE — chart fills the fixed-height container cleanly
+      maintainAspectRatio: false,
+      animation: { duration: 400 },   // FIX: shorter animation = no slow grow effect
+      plugins: {
+        legend: { display: true, position: "top" }
+      },
+      scales: {
+        x: {
+          ticks: {
+            font: { size: 10 },
+            maxRotation: 45,
+            minRotation: 30
+          }
+        },
+        y: {
+          ticks: { font: { size: 10 } }
+        }
+      }
+    }
   });
 }
 
-// Start fetching on load
 fetchData();
 </script>
 </body>
